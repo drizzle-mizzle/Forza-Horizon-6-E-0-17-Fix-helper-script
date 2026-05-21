@@ -173,7 +173,7 @@ function Run-Diagnostics {
 
     Bar
     Line "Диагностика завершена. Лог: $LogFile" "Diagnostics complete. Log: $LogFile" 'Cyan'
-    Line "Дальше открой меню фиксов и иди сверху вниз, проверяя игру после каждого." "Next, open the fixes menu and go top-down, testing the game after each." 'Cyan'
+    Line "Перейдите в меню фиксов и пробуйте применять каждый один за другим, идя сверху вниз, и пробуя запускать игру после каждого (или примените все разом)." "Next, open the fixes menu and go top-down, testing the game after each." 'Cyan'
 }
 
 # ============================================================================
@@ -182,7 +182,7 @@ function Run-Diagnostics {
 $Fixes = @(
  @{
    Id=1
-   TitleRu='Включить телеметрию и загрузку OneSettings (КОРЕНЬ ПРОБЛЕМЫ)'
+   TitleRu='Включить телеметрию и загрузку OneSettings (ОСНОВНАЯ ПРОБЛЕМА)'
    TitleEn='Enable telemetry & OneSettings downloads (ROOT CAUSE)'
    DescRu='Debloat-скрипты выключают телеметрию и ставят DisableOneSettingsDownloads=1. Без OneSettings Windows не может выдать лицензию/конфиг, и Gaming Services не создаёт папку сохранений — отсюда E:0-17.'
    DescEn='Debloat scripts turn telemetry off and set DisableOneSettingsDownloads=1. Without OneSettings, Windows cannot fetch the license/config, so Gaming Services never provisions the save folder — hence E:0-17.'
@@ -407,7 +407,7 @@ function Show-FixDetail {
 function Fixes-Menu {
     while ($true) {
         Bar
-        Line "МЕНЮ ФИКСОВ — выбирай по порядку сверху вниз" "FIXES MENU — go top-down" 'Cyan'
+        Line "СПИСОК ФИКСОВ — выбирай по порядку сверху вниз" "FIXES MENU — go top-down" 'Cyan'
         Line "После каждого применённого фикса запусти игру и проверь E:0-17." "After each applied fix, launch the game and check E:0-17." 'Cyan'
         Bar
         foreach ($f in $Fixes) {
@@ -454,13 +454,13 @@ Bar
 Line "Forza Horizon 6  E:0-17 — диагностика и исправление" "Forza Horizon 6  E:0-17 — diagnose & fix" 'Cyan'
 Bar
 if (-not (Is-Admin)) {
-    Line "ВНИМАНИЕ: запущено без прав администратора. Диагностика доступна, но фиксы — нет." "WARNING: not running as admin. Diagnostics work, but fixes do not." 'Red'
-    Line "Закрой и перезапусти PowerShell «От имени администратора»." "Close and relaunch PowerShell 'As administrator'." 'Yellow'
+    Line "ВНИМАНИЕ: скрипт запущен без прав администратора. Диагностика доступна, но исправления могут не работать." "WARNING: The script was run without administrator rights. Diagnostics are available, but fixes may not work." 'Red'
+    Line "Закройте и перезапустите PowerShell «От имени администратора»." "Close and relaunch PowerShell 'As administrator'." 'Yellow'
 }
 Raw ''
-Line "Что сделать сначала?" "What first?" 'Cyan'
-Line "  [1] Полная диагностика (рекомендуется при первом запуске)" "  [1] Full diagnostics (recommended on first run)" 'White'
-Line "  [2] Сразу к меню фиксов (если уже делал диагностику)" "  [2] Go straight to the fixes menu (if you already ran diagnostics)" 'White'
+Line "Выберите действие" "Select an action" 'Cyan'
+Line "  [1] Диагностика проблем" "  [1] Full diagnostics" 'White'
+Line "  [2] Меню исправлений" "  [2] Fixes menu" 'White'
 Line "  [Q] Выход" "  [Q] Quit" 'White'
 $start = (Read-Host "> ").Trim()
 switch -regex ($start) {
