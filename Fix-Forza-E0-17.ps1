@@ -419,7 +419,7 @@ function Fixes-Menu {
         $sel = (Read-Host "> ").Trim()
         if ($sel -match '^[Qq]') { break }
         if ($sel -match '^[Dd]') { Run-Diagnostics; continue }
-        if ($sel -match '^\d+$' -and ($fix = $Fixes | Where-Object Id -eq [int]$sel)) {
+        if ($sel -match '^\d+$' -and ($fix = $Fixes | Where-Object { $_.Id -eq [int]$sel })) {
             Show-FixDetail $fix
             Line "Действие: A — применить, U — откатить, B — назад" "Action: A — apply, U — undo(rollback), B — back" 'Cyan'
             $act = (Read-Host "> ").Trim()
