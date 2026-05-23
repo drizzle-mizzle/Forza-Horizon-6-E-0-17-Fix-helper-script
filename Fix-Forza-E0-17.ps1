@@ -158,7 +158,8 @@ function Run-Diagnostics {
 
     # 7. Firewall
     Line "[7] Брандмауэр (исходящие блокировки)" "[7] Firewall (outbound block rules)" 'White'
-    $fw = Get-NetFirewallRule -Action Block -Enabled True -Direction Outbound | Where-Object DisplayName -match $MsPattern
+    # -ErrorAction SilentlyContinue required: Get-NetFirewallRule throws a CIM error (not just empty) when no rules match the query.
+    $fw = Get-NetFirewallRule -Action Block -Enabled True -Direction Outbound -ErrorAction SilentlyContinue | Where-Object DisplayName -match $MsPattern
     if ($fw) { Line "    [ПРОБЛЕМА] Block-правил по доменам Microsoft/Xbox: $(($fw|Measure-Object).Count)" "    [PROBLEM] Microsoft/Xbox outbound block rules: $(($fw|Measure-Object).Count)" 'Red' }
     else     { Line "    [OK] Block-правил по Microsoft/Xbox нет" "    [OK] No Microsoft/Xbox block rules" 'Green' }
 
@@ -314,7 +315,7 @@ $Fixes = @(
    RollbackRu='Снова включает ранее отключённые правила.'
    RollbackEn='Re-enables the previously disabled rules.'
    Apply={
-     $fw = Get-NetFirewallRule -Action Block -Enabled True -Direction Outbound | Where-Object DisplayName -match $MsPattern
+     $fw = Get-NetFirewallRule -Action Block -Enabled True -Direction Outbound -ErrorAction SilentlyContinue | Where-Object DisplayName -match $MsPattern
      if ($fw) {
        foreach ($r in $fw) { Add-Record @{ FixId=7; Kind='FirewallDisabled'; Name=$r.Name }; Set-NetFirewallRule -Name $r.Name -Enabled False }
        Line "Отключено правил: $(($fw|Measure-Object).Count)." "Rules disabled: $(($fw|Measure-Object).Count)." 'Green'
@@ -419,7 +420,8 @@ function Fixes-Menu {
         $sel = (Read-Host "> ").Trim()
         if ($sel -match '^[Qq]') { break }
         if ($sel -match '^[Dd]') { Run-Diagnostics; continue }
-        if ($sel -match '^\d+$' -and ($fix = $Fixes | Where-Object Id -eq [int]$sel)) {
+        # Scriptblock form required: simplified syntax "Where-Object Id -eq [int]$sel" mis-parses [int] as the value, so the cast is never applied and no fix is matched.
+        if ($sel -match '^\d+$' -and ($fix = $Fixes | Where-Object { $_.Id -eq [int]$sel })) {
             Show-FixDetail $fix
             Line "Действие: A — применить, U — откатить, B — назад" "Action: A — apply, U — undo(rollback), B — back" 'Cyan'
             $act = (Read-Host "> ").Trim()
